@@ -98,6 +98,14 @@ module.exports = function (grunt) {
                 files: [
                     {expand: true, cwd: '../dist/', src: ['**'], dest: '/'}
                 ]
+            },
+            releaseLatest: {
+                options: {
+                    archive: '../build/' + config.ExtensionName + '_latest.zip'
+                },
+                files: [
+                    {expand: true, cwd: '../dist/', src: ['**'], dest: '/'}
+                ]
             }
         },
 
@@ -199,7 +207,8 @@ module.exports = function (grunt) {
         'cleanempty',
 
         'copy:copy_to_local',
-        'compress:release'
+        'compress:release',
+        'compress:releaseLatest'
     ]);
 
 };
