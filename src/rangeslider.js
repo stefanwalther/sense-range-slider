@@ -6,14 +6,14 @@ define([
         'jquery',
         'qvangular',
         'angular',
-        'qlikview',
+        'qlik',
         './rangeslider-properties',
         'text!./lib/templ/slider.ng.html',
 
         // No return values
         './lib/external/angular-rangeslider/angular.rangeSlider'
 ],
-function ($, qvangular, angular, qlikview, properties, template) {
+function ($, qvangular, angular, qlik, properties, template) {
 
     'use strict';
 
@@ -76,15 +76,15 @@ function ($, qvangular, angular, qlikview, properties, template) {
 
                 if (parseFloat(val) !== parseFloat(oldVal)) {
                     //console.log('set min: ', val);
-                    var app = qlikview.currApp();
+                    var app = qlik.currApp();
                     app.variable.setContent('' + $scope.layout.settings.varMin + '', '' + val + '')
                         .then(function (data) {
                             // Due to a bug in 0.96 the promise doesn't return always a value ...
-                            console.log('ok');
+                            //console.log('ok');
                             angular.noop();
                         }, function (err) {
                             // never called
-                            console.log('error');
+                            //console.log('error');
                             angular.noop();
                         });
                 }
@@ -93,7 +93,7 @@ function ($, qvangular, angular, qlikview, properties, template) {
                 if (parseFloat(val) !== parseFloat(oldVal)) {
                     var maxVar = $scope.layout.settings.varMax;
                     //console.log('set max variable (' + maxVar + ') ' + val + ' (old: ' + oldVal + ')');
-                    var app = qlikview.currApp();
+                    var app = qlik.currApp();
                     app.variable.setContent('' + maxVar + '', '' + val + '');
                 }
             });

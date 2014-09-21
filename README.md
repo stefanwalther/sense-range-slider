@@ -21,17 +21,14 @@ Create your variables in the Data Load Script, eg.
 
 Then the variables can be used in the Range Slider.
 
-## Version
-Version 0.0.1 based on Qlik Sense 0.96
+## Latest Version
+Version 0.1.0 based on Qlik Sense 1.0
 
 ## Known Issues
 * This a very, very basic prototype, a lot of features are missing
 	* Validation
 	* Manipulating not only a range of values but also a single value
 	* Showing the scale and current value
-
-## Roadmap
-* At GA time later this autumn I'll publish a more advanced version of this Range-Slider covering the missing features described above.
 
 ## Author
 Stefan Walther, 2014
