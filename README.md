@@ -1,4 +1,4 @@
-# Range Slider
+# Range Slider for Qlik Sense
 
 Very early prototype of a Range Slider to manipulate two variables in Qlik Sense.
 
