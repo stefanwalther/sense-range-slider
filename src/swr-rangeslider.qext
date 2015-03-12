@@ -1,0 +1,9 @@
+{
+	"name" : "Range Slider",
+	"description" : "Slider object for Qlik Sense to manipulate one or two variables.",
+	"icon" : "extension",
+	"type" : "visualization",
+	"version": "@@version",
+	"preview" : "rangeslider.png",
+	"author": "Stefan Walther"
+}
