@@ -1,4 +1,4 @@
-# Range Slider
+# Range Slider for Qlik Sense
 
 > Slider object for Qlik Sense to manipulate one or two variables.
 
