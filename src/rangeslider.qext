@@ -1,9 +1,0 @@
-{
-	"name" : "Range Slider",
-	"description" : "Slider for defining a numeric range with two variables.",
-	"icon" : "extension",
-	"type" : "visualization",
-	"version": "@@version",
-	"preview" : "rangeslider.png",
-	"author": "Stefan Walther"
-}
