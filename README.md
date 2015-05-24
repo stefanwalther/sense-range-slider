@@ -68,7 +68,6 @@ I'd love to see that this becomes a community solution
 
 ## Author
 **Stefan Walther**
-**Stefan Walther** 
 * [qliksite.io](http://qliksite.io)
 * [github.com/stefanwalther](http://github.com/stefanwalther)
 * [twitter.com/waltherstefan](http://twitter.com/waltherstefan)
