@@ -2,6 +2,8 @@
 
 > Slider object for Qlik Sense to manipulate one or two variables.
 
+[![](http://serve.mod.bz/branch/)](https://github.com/stefanwalther/sense-range-slider)
+
 
 ## Example 
 ![](docs/img/RangeSlider_Basic.png)
@@ -41,9 +43,9 @@ Create your variables in the Data Load Script, eg.
 Then the variables can be used in the Range Slider.
 
 ## Versions:
-* [Latest version, Qlik Sense 1.1](https://github.com/stefanwalther/qsRangeSlider/raw/master/build/swr-rangeslider_latest.zip)
-* [Version 0.2.0 for Qlik Sense 1.1](https://github.com/stefanwalther/qsRangeSlider/raw/master/build/swr-rangeslider_v0.2.0.zip)
-* [Version 0.1.0 for Qlik Sense 1.0](https://github.com/stefanwalther/qsRangeSlider/raw/master/build/RangeSlider_0.1.0.zip)
+* [Latest version, Qlik Sense 1.1](https://github.com/stefanwalther/sense-range-slider/raw/master/build/sense-range-slider_latest.zip)
+* [Version 0.2.0 for Qlik Sense 1.1](https://github.com/stefanwalther/sense-range-slider/raw/master/build/swr-rangeslider_v0.2.0.zip)
+* [Version 0.1.0 for Qlik Sense 1.0](https://github.com/stefanwalther/sense-range-slider/raw/master/build/RangeSlider_0.1.0.zip)
 
 ## Roadmap & Known Issues
 This a very, very basic prototype, a lot of features are missing I'd like to implement:
@@ -62,7 +64,7 @@ This a very, very basic prototype, a lot of features are missing I'd like to imp
 - [ ] Implement a more intelligent delay when the update will be sent to the Qlik Engine
 
 ## Contributing
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/stefanwalther/qsRangeSlider/issues)
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/stefanwalther/sense-range-slider/issues)
 
 I'd love to see that this becomes a community solution
 
