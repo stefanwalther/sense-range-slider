@@ -1,5 +1,5 @@
 {
-  "name": "qsRangeSlider",
+  "name": "sense-range-slider",
   "version": "0.2.0",
   "description": "Slider object for Qlik Sense to manipulate one or two variables.",
   "main": "index.js",

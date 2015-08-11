@@ -1,4 +1,11 @@
 
+## Version 0.2.1
+Date: 2015-08-10
+
+**Enhancements:**
+
+* Move over to sense-go
+
 ## Version 0.2.0
 Date: 2015-03-11
 
