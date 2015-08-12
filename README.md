@@ -6,7 +6,7 @@
 
 
 ## Example 
-![](docs/img/RangeSlider_Basic.png)
+![](docs/images/sense-range-slider_Basic.png)
 
 ## Properties:
 
@@ -32,7 +32,7 @@ This demonstrates a sample configuration defining:
 * A step of 1, so the user can change the value in steps by one
 * Two variables "taking care" of the values, `vExample1_Min` and `vExample1_Max`
 
-![](screenshots/qsRangeSlider_PropertyPanel.png)
+![](docs/images/sense-range-slider_PropertyPanel.png)
 
 ## Creating variables in Qlik Sense:
 Create your variables in the Data Load Script, eg.
