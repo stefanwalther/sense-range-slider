@@ -1,0 +1,14 @@
+initialproperties.js;
+lib/external/angular-rangeslider/angular.rangeSlider.css;
+lib/external/angular-rangeslider/angular.rangeSlider.js;
+lib/external/angular-rangeslider/arrows/down-arrow.png;
+lib/external/angular-rangeslider/arrows/left-arrow.png;
+lib/external/angular-rangeslider/arrows/right-arrow.png;
+lib/external/angular-rangeslider/arrows/up-arrow.png;
+lib/external/angular-rangeslider/Copyright.md;
+lib/js/extensionUtils.js;
+lib/templ/slider.ng.html;
+properties.js;
+rangeslider.png;
+swr-rangeslider.js;
+swr-rangeslider.qext
