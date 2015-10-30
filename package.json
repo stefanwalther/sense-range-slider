@@ -1,6 +1,6 @@
 {
   "name": "sense-range-slider",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Slider object for Qlik Sense to manipulate one or two variables.",
   "main": "index.js",
   "directories": {
@@ -24,5 +24,8 @@
   "homepage": "https://github.com/QlikDev/qsRangeSlider",
   "devDependencies": {
     "sense-go": "^0.5.1"
+  },
+  "dependencies": {
+    "sense-extension-utils": "^0.1.3"
   }
 }

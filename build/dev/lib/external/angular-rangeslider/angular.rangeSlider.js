@@ -1,3 +1,40 @@
+/*
+ *  Angular RangeSlider Directive
+ * 
+ *  Version: 0.0.13
+ *
+ *  Author: Daniel Crisp, danielcrisp.com
+ *
+ *  The rangeSlider has been styled to match the default styling
+ *  of form elements styled using Twitter's Bootstrap
+ *
+ *  Originally forked from https://github.com/leongersen/noUiSlider
+ *
+
+ This code is released under the MIT Licence - http://opensource.org/licenses/MIT
+
+ Copyright (c) 2013 Daniel Crisp
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+
+ */
+
 /*global define*/
 define( [
 		'jquery',
@@ -6,22 +43,22 @@ define( [
 		'./../../js/extensionUtils',
 		'text!./angular.rangeSlider.css'
 	],
-	function ( $, qvangular, angular, extensionUtils, cssContent ) {
-
+	function ( $, qvangular, angular, extUtils, cssContent ) {
 		'use strict';
+
+		// check if we need to support legacy angular
+		var legacySupport = (angular.version.major === 1 && angular.version.minor === 0);
+		extUtils.addStyleToHeader( cssContent );
 
 		/**
 		 * RangeSlider, allows user to define a range of values using a slider
 		 * Touch friendly.
 		 * @directive
 		 */
-		qvangular.directive( 'rangeSlider', ["$document", "$filter", "$log", function ( $document, $filter, $log ) {
-
-			extensionUtils.addStyleToHeader( cssContent );
+		qvangular.directive( 'rangeSlider', ['$document', '$filter', '$log', function ( $document, $filter, $log ) {
 
 			// test for mouse, pointer or touch
-			var EVENT = window.PointerEvent ? 1 : (window.MSPointerEvent ? 2 : ('ontouchend' in document ? 3 : 4)), // 1 = IE11, 2 = IE10, 3 = touch, 4 = mouse
-				eventNamespace = '.rangeSlider',
+			var eventNamespace = '.rangeSlider',
 
 				defaults = {
 					disabled: false,
@@ -33,9 +70,34 @@ define( [
 					attachHandleValues: false
 				},
 
-				onEvent = (EVENT === 1 ? 'pointerdown' : (EVENT === 2 ? 'MSPointerDown' : (EVENT === 3 ? 'touchstart' : 'mousedown'))) + eventNamespace,
-				moveEvent = (EVENT === 1 ? 'pointermove' : (EVENT === 2 ? 'MSPointerMove' : (EVENT === 3 ? 'touchmove' : 'mousemove'))) + eventNamespace,
-				offEvent = (EVENT === 1 ? 'pointerup' : (EVENT === 2 ? 'MSPointerUp' : (EVENT === 3 ? 'touchend' : 'mouseup'))) + eventNamespace,
+			// Determine the events to bind. IE11 implements pointerEvents without
+			// a prefix, which breaks compatibility with the IE10 implementation.
+				/** @const */
+				actions = window.navigator.pointerEnabled ? {
+					start: 'pointerdown',
+					move: 'pointermove',
+					end: 'pointerup',
+					over: 'pointerdown',
+					out: 'mouseout'
+				} : window.navigator.msPointerEnabled ? {
+					start: 'MSPointerDown',
+					move: 'MSPointerMove',
+					end: 'MSPointerUp',
+					over: 'MSPointerDown',
+					out: 'mouseout'
+				} : {
+					start: 'mousedown touchstart',
+					move: 'mousemove touchmove',
+					end: 'mouseup touchend',
+					over: 'mouseover touchstart',
+					out: 'mouseout'
+				},
+
+				onEvent = actions.start + eventNamespace,
+				moveEvent = actions.move + eventNamespace,
+				offEvent = actions.end + eventNamespace,
+				overEvent = actions.over + eventNamespace,
+				outEvent = actions.out + eventNamespace,
 
 			// get standarised clientX and clientY
 				client = function ( f ) {
@@ -56,32 +118,10 @@ define( [
 				isNumber = function ( n ) {
 					// console.log(n);
 					return !isNaN( parseFloat( n ) ) && isFinite( n );
-				};
+				},
 
-			if ( EVENT < 4 ) {
-				// some sort of touch has been detected
-				angular.element( 'html' ).addClass( 'ngrs-touch' );
-			} else {
-				angular.element( 'html' ).addClass( 'ngrs-no-touch' );
-			}
-
-			return {
-				restrict: 'A',
-				replace: true,
-				template: ['<div class="ngrs-range-slider">',
-					'<div class="ngrs-runner">',
-					'<div class="ngrs-handle ngrs-handle-min"><i></i></div>',
-					'<div class="ngrs-handle ngrs-handle-max"><i></i></div>',
-					'<div class="ngrs-join"></div>',
-					'</div>',
-					'<div class="ngrs-value-runner">',
-					'<div class="ngrs-value ngrs-value-min" ng-show="showValues"><div>{{filteredModelMin}}</div></div>',
-					'<div class="ngrs-value ngrs-value-max" ng-show="showValues"><div>{{filteredModelMax}}</div></div>',
-					'</div>',
-					'</div>'].join( '' ),
-				scope: {
+				scopeOptions = {
 					disabled: '=?',
-					modelDisabled: '=?',
 					min: '=',
 					max: '=',
 					modelMin: '=?',
@@ -96,8 +136,40 @@ define( [
 					showValues: '@',
 					pinHandle: '@',
 					preventEqualMinMax: '@',
-					attachHandleValues: '@'
-				},
+					attachHandleValues: '@',
+					getterSetter: '@' // Allow the use of getterSetters for model values
+				};
+
+			if ( legacySupport ) {
+				// make optional properties required
+				scopeOptions.disabled = '=';
+				scopeOptions.modelMin = '=';
+				scopeOptions.modelMax = '=';
+			}
+
+			// if (EVENT < 4) {
+			//     // some sort of touch has been detected
+			//     angular.element('html').addClass('ngrs-touch');
+			// } else {
+			//     angular.element('html').addClass('ngrs-no-touch');
+			// }
+
+			return {
+				restrict: 'A',
+				replace: true,
+				template: ['<div class="ngrs-range-slider">',
+					'<div class="ngrs-runner">',
+					'<div class="ngrs-handle ngrs-handle-min"><i></i></div>',
+					'<div class="ngrs-handle ngrs-handle-max"><i></i></div>',
+					'<div class="ngrs-join"></div>',
+					'</div>',
+					'<div class="ngrs-value-runner">',
+					'<div class="ngrs-value ngrs-value-min" ng-show="showValues"><div>{{filteredModelMin}}</div></div>',
+					'<div class="ngrs-value ngrs-value-max" ng-show="showValues"><div>{{filteredModelMax}}</div></div>',
+					'</div>',
+					'</div>'
+				].join( '' ),
+				scope: scopeOptions,
 				link: function ( scope, element, attrs, controller ) {
 
 					/**
@@ -112,11 +184,12 @@ define( [
 						posOpp = 'right',
 						orientation = 0,
 						allowedRange = [0, 0],
-						range = 0;
+						range = 0,
+						down = false;
 
 					// filtered
-					scope.filteredModelMin = scope.modelMin;
-					scope.filteredModelMax = scope.modelMax;
+					scope.filteredModelMin = modelMin();
+					scope.filteredModelMax = modelMax();
 
 					/**
 					 *  FALL BACK TO DEFAULTS FOR SOME ATTRIBUTES
@@ -209,20 +282,45 @@ define( [
 						if ( !angular.isDefined( val ) ) {
 							scope.attachHandleValues = defaults.attachHandleValues;
 						} else {
-							if ( val === 'false' ) {
-								scope.attachHandleValues = false;
-							} else {
+							if ( val === 'true' || val === '' ) {
+								// flag as true
 								scope.attachHandleValues = true;
+								// add class to runner
+								element.find( '.ngrs-value-runner' ).addClass( 'ngrs-attached-handles' );
+							} else {
+								scope.attachHandleValues = false;
 							}
 						}
 					} );
+
+					// GetterSetters for model values
+
+					function modelMin ( newValue ) {
+						if ( scope.getterSetter ) {
+							return arguments.length ? scope.modelMin( newValue ) : scope.modelMin();
+						} else {
+							return arguments.length ? (scope.modelMin = newValue) : scope.modelMin;
+						}
+					}
+
+					function modelMax ( newValue ) {
+						if ( scope.getterSetter ) {
+							return arguments.length ? scope.modelMax( newValue ) : scope.modelMax();
+						} else {
+							return arguments.length ? (scope.modelMax = newValue) : scope.modelMax;
+						}
+					}
 
 					// listen for changes to values
 					scope.$watch( 'min', setMinMax );
 					scope.$watch( 'max', setMinMax );
 
-					scope.$watch( 'modelMin', setModelMinMax );
-					scope.$watch( 'modelMax', setModelMinMax );
+					scope.$watch( function () {
+						return modelMin();
+					}, setModelMinMax );
+					scope.$watch( function () {
+						return modelMax();
+					}, setModelMinMax );
 
 					/**
 					 * HANDLE CHANGES
@@ -243,9 +341,9 @@ define( [
 
 					function setDisabledStatus ( status ) {
 						if ( status ) {
-							$slider.addClass( 'disabled' );
+							$slider.addClass( 'ngrs-disabled' );
 						} else {
-							$slider.removeClass( 'disabled' );
+							$slider.removeClass( 'ngrs-disabled' );
 						}
 					}
 
@@ -278,55 +376,81 @@ define( [
 
 					function setModelMinMax () {
 
-						if ( scope.modelMin > scope.modelMax ) {
+						if ( modelMin() > modelMax() ) {
 							throwWarning( 'modelMin must be less than or equal to modelMax' );
 							// reset values to correct
-							scope.modelMin = scope.modelMax;
+							modelMin( modelMax() );
 						}
 
 						// only do stuff when both values are ready
 						if (
-							(angular.isDefined( scope.modelMin ) || scope.pinHandle === 'min') &&
-							(angular.isDefined( scope.modelMax ) || scope.pinHandle === 'max')
+							(angular.isDefined( modelMin() ) || scope.pinHandle === 'min') &&
+							(angular.isDefined( modelMax() ) || scope.pinHandle === 'max')
 						) {
 
 							// make sure they are numbers
-							if ( !isNumber( scope.modelMin ) ) {
+							if ( !isNumber( modelMin() ) ) {
 								if ( scope.pinHandle !== 'min' ) {
 									throwWarning( 'modelMin must be a number' );
 								}
-								scope.modelMin = scope.min;
+								modelMin( scope.min );
 							}
 
-							if ( !isNumber( scope.modelMax ) ) {
+							if ( !isNumber( modelMax() ) ) {
 								if ( scope.pinHandle !== 'max' ) {
 									throwWarning( 'modelMax must be a number' );
 								}
-								scope.modelMax = scope.max;
+								modelMax( scope.max );
 							}
 
-							var handle1pos = restrict( ((scope.modelMin - scope.min) / range) * 100 ),
-								handle2pos = restrict( ((scope.modelMax - scope.min) / range) * 100 );
+							var handle1pos = restrict( ((modelMin() - scope.min) / range) * 100 ),
+								handle2pos = restrict( ((modelMax() - scope.min) / range) * 100 ),
+								value1pos,
+								value2pos;
 
 							if ( scope.attachHandleValues ) {
-								var value1pos = handle1pos,
-									value2pos = handle2pos;
+								value1pos = handle1pos;
+								value2pos = handle2pos;
 							}
 
 							// make sure the model values are within the allowed range
-							scope.modelMin = Math.max( scope.min, scope.modelMin );
-							scope.modelMax = Math.min( scope.max, scope.modelMax );
+							modelMin( Math.max( scope.min, modelMin() ) );
+							modelMax( Math.min( scope.max, modelMax() ) );
 
-							if ( scope.filter ) {
-								scope.filteredModelMin = $filter( scope.filter )( scope.modelMin, scope.filterOptions );
-								scope.filteredModelMax = $filter( scope.filter )( scope.modelMax, scope.filterOptions );
+							if ( scope.filter && scope.filterOptions ) {
+								scope.filteredModelMin = $filter( scope.filter )( modelMin(), scope.filterOptions );
+								scope.filteredModelMax = $filter( scope.filter )( modelMax(), scope.filterOptions );
+							} else if ( scope.filter ) {
+
+								var filterTokens = scope.filter.split( ':' ),
+									filterName = scope.filter.split( ':' )[0],
+									filterOptions = filterTokens.slice().slice( 1 ),
+									modelMinOptions,
+									modelMaxOptions;
+
+								// properly parse string and number args
+								filterOptions = filterOptions.map( function ( arg ) {
+									if ( isNumber( arg ) ) {
+										return +arg;
+									} else if ( (arg[0] == "\"" && arg[arg.length - 1] == "\"") || (arg[0] == "\'" && arg[arg.length - 1] == "\'") ) {
+										return arg.slice( 1, -1 );
+									}
+								} );
+
+								modelMinOptions = filterOptions.slice();
+								modelMaxOptions = filterOptions.slice();
+								modelMinOptions.unshift( modelMin() );
+								modelMaxOptions.unshift( modelMax() );
+
+								scope.filteredModelMin = $filter( filterName ).apply( null, modelMinOptions );
+								scope.filteredModelMax = $filter( filterName ).apply( null, modelMaxOptions );
 							} else {
-								scope.filteredModelMin = scope.modelMin;
-								scope.filteredModelMax = scope.modelMax;
+								scope.filteredModelMin = modelMin();
+								scope.filteredModelMax = modelMax();
 							}
 
 							// check for no range
-							if ( scope.min === scope.max && scope.modelMin == scope.modelMax ) {
+							if ( scope.min === scope.max && modelMin() == modelMax() ) {
 
 								// reposition handles
 								angular.element( handles[0] ).css( pos, '0%' );
@@ -334,7 +458,6 @@ define( [
 
 								if ( scope.attachHandleValues ) {
 									// reposition values
-									angular.element( '.ngrs-value-runner' ).addClass( 'ngrs-attached-handles' );
 									angular.element( values[0] ).css( pos, '0%' );
 									angular.element( values[1] ).css( pos, '100%' );
 								}
@@ -350,7 +473,6 @@ define( [
 
 								if ( scope.attachHandleValues ) {
 									// reposition values
-									angular.element( '.ngrs-value-runner' ).addClass( 'ngrs-attached-handles' );
 									angular.element( values[0] ).css( pos, value1pos + '%' );
 									angular.element( values[1] ).css( pos, value2pos + '%' );
 									angular.element( values[1] ).css( posOpp, 'auto' );
@@ -377,8 +499,8 @@ define( [
 						$handle.bind( onEvent + 'X', function ( event ) {
 
 							var handleDownClass = (index === 0 ? 'ngrs-handle-min' : 'ngrs-handle-max') + '-down',
-								unbind = $handle.add( $document ).add( 'body' ),
-								modelValue = (index === 0 ? scope.modelMin : scope.modelMax) - scope.min,
+							//unbind = $handle.add($document).add('body'),
+								modelValue = (index === 0 ? modelMin() : modelMax()) - scope.min,
 								originalPosition = (modelValue / range) * 100,
 								originalClick = client( event ),
 								previousClick = originalClick,
@@ -395,6 +517,9 @@ define( [
 
 							// only do stuff if we are disabled
 							if ( !scope.disabled ) {
+
+								// flag as down
+								down = true;
 
 								// add down class
 								$handle.addClass( 'ngrs-down' );
@@ -414,7 +539,7 @@ define( [
 										proposal,
 										other,
 										per = (scope.step / range) * 100,
-										otherModelPosition = (((index === 0 ? scope.modelMax : scope.modelMin) - scope.min) / range) * 100;
+										otherModelPosition = (((index === 0 ? modelMax() : modelMin()) - scope.min) / range) * 100;
 
 									if ( currentClick[0] === "x" ) {
 										return;
@@ -473,11 +598,11 @@ define( [
 										if ( index === 0 ) {
 
 											// update model as we slide
-											scope.modelMin = parseFloat( (((proposal * range) / 100) + scope.min) ).toFixed( scope.decimalPlaces );
+											modelMin( parseFloat( parseFloat( (((proposal * range) / 100) + scope.min) ).toFixed( scope.decimalPlaces ) ) );
 
 										} else if ( index === 1 ) {
 
-											scope.modelMax = parseFloat( (((proposal * range) / 100) + scope.min) ).toFixed( scope.decimalPlaces );
+											modelMax( parseFloat( parseFloat( (((proposal * range) / 100) + scope.min) ).toFixed( scope.decimalPlaces ) ) );
 										}
 
 										// update angular
@@ -495,12 +620,18 @@ define( [
 										scope.onHandleUp();
 									}
 
-									unbind.off( eventNamespace );
+									// unbind listeners
+									$document.off( moveEvent );
+									$document.off( offEvent );
 
 									angular.element( 'body' ).removeClass( 'ngrs-touching' );
 
-									// remove down class
+									// cancel down flag
+									down = false;
+
+									// remove down and over class
 									$handle.removeClass( 'ngrs-down' );
+									$handle.removeClass( 'ngrs-over' );
 
 									// remove active class
 									$slider.removeClass( 'ngrs-focus ' + handleDownClass );
@@ -508,12 +639,18 @@ define( [
 								} );
 							}
 
+						} ).on( overEvent, function () {
+							$handle.addClass( 'ngrs-over' );
+						} ).on( outEvent, function () {
+							if ( !down ) {
+								$handle.removeClass( 'ngrs-over' );
+							}
 						} );
 					}
 
 					function throwError ( message ) {
 						scope.disabled = true;
-						throw new Error( "RangeSlider: " + message );
+						throw new Error( 'RangeSlider: ' + message );
 					}
 
 					function throwWarning ( message ) {
@@ -548,7 +685,7 @@ define( [
 					 */
 
 					$slider
-						// disable selection
+					// disable selection
 						.bind( 'selectstart' + eventNamespace, function ( event ) {
 							return false;
 						} )
@@ -576,7 +713,4 @@ define( [
 					window.setTimeout( callback, 1000 / 60 );
 				};
 		})();
-
 	} );
-
-

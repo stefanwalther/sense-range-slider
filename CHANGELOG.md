@@ -1,4 +1,11 @@
 
+## Version 0.2.5
+Date: 2015-10-30
+
+**Enhancements**
+
+* Updated to newest version of range-slider component used
+
 ## Version 0.2.1
 Date: 2015-08-10
 
