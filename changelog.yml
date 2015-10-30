@@ -1,0 +1,26 @@
+version: "0.5.6"
+  date: "2015-10-26"
+  enhancements:
+    - "Disable buttons in edit mode (solves #26)"
+version: "0.2.5"
+  date: "2015-10-30"
+  enhancements:
+    - "Updated to newest version of range-slider component used"
+version: "0.2.1"
+  date: "2015-08-10"
+  enhancements:
+    - "Move over to sense-go"
+version: "0.2.0"
+  date: "2015-03-11"
+  enhancements:
+    - "Support for Qlik Sense 1.1"
+  changes:
+    - "(breaking) The namespace for the slider has changed, so you have to re-create existing slider objects."
+version: "0.1.0"
+  date: "2014-09-21"
+  enhancements:
+    - "Updated version for Qlik Sense 1.0 (Build Nr. 21)"
+version: "0.0.1"
+  date: "2014-08-13"
+  new:
+    - "Initial Version"
