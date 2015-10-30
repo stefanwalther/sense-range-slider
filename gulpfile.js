@@ -1,11 +1,10 @@
 'use strict';
-var gulp = require('gulp');
-var senseGo = require('sense-go');
+var gulp = require( 'gulp' );
+var senseGo = require( 'sense-go' );
+var path = require( 'path' );
 
-var userConfig = {
-	"packageName": "sense-range-slider"
-};
+var userConfig = senseGo.loadYml( path.join( __dirname, 'sense-go.yml' ) );
 
-senseGo.init( gulp, userConfig,  function (  ) {
+senseGo.init( gulp, userConfig, function () {
 
-});
+} );
