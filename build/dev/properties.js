@@ -39,7 +39,7 @@ define( [], function () {
 	};
 
 	var sliderStep = {
-		ref: "props.sliderStep",
+		ref: "props.step",
 		label: "Step",
 		type: "number",
 		expression: "optional",

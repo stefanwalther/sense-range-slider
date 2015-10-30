@@ -19,70 +19,82 @@ define( [
 			definition: props,
 			initialProperties: initprops,
 			template: ngTemplate,
-			snapshot: {
-				// Doesn't make sense to enable the slider in StoryTelling-mode, so disable it
-				canTakeSnapshot: false
-			},
+			snapshot: { canTakeSnapshot: false },
 			controller: ['$scope', function ( $scope ) {
 
-				var app = qlik.currApp();
+				var opts = $scope.sliderOpts = {
+					orientation: 'horizontal',
+					step: 1,
+					rangeMin:0,
+					rangeMax: 100,
+					min: 0,
+					max: 100,
+					disabled: false,
+					minVar: null,
+					maxVar: null
+				};
 
-				$scope.sliderOrientation = 'horizontal';
-				console.log( 'sliderStep', $scope.layout.props.sliderStep );
-				$scope.sliderStep = $scope.layout.props.sliderStep || 1;
-				$scope.rangeMin = $scope.layout.props.rangeMin || 0;
-				$scope.rangeMax = $scope.layout.props.rangeMax || 100;
-				$scope.min = $scope.rangeMin;
-				$scope.max = $scope.rangeMax;
-				$scope.disabled = false;
+				//Todo: prop for disabled
+				//Todo: prop for orientation
+				opts.step = $scope.layout.props.sliderStep || 1;
+				opts.rangeMin = $scope.layout.props.rangeMin || 0;
+				opts.rangeMax = $scope.layout.props.rangeMax || 100;
 
 				$scope.$watch( 'layout.props.enabled', function ( val, oldVal ) {
 					if ( val !== oldVal ) {
-						$scope.disabled = !val;
+						opts.disabled = !val;
 					}
 				} );
 
-				$scope.$watch( 'layout.props.sliderStep', function ( val ) {
-					$scope.sliderStep = val || 1;
+				$scope.$watch( 'layout.props.step', function ( val ) {
+					opts.step = val || 1;
 				} );
 
 				$scope.$watch( 'layout.props.rangeMin', function ( val ) {
-					$scope.rangeMin = val || 1;
+					opts.rangeMin = val || 1;
 				} );
 
 				$scope.$watch( 'layout.props.rangeMax', function ( val ) {
-					$scope.rangeMax = val || 100;
+					opts.rangeMax = val || 100;
 				} );
 
-				$scope.$watch( 'min', function ( val, oldVal ) {
+				$scope.$watch( 'sliderOpts.min', function ( val, oldVal ) {
 
 					if ( parseFloat( val ) !== parseFloat( oldVal ) ) {
-						app.variable.setContent( '' + $scope.layout.props.varMin + '', '' + val + '' )
+						getApp().variable.setContent( '' + getMinVar() + '', '' + val + '' )
 							.then( function ( data ) {
-								console.log( 'data', data );
-								// Due to a bug in 0.96 the promise doesn't return always a value ...
-								//console.log('ok');
 								angular.noop();
 							}, function ( err ) {
 								if ( err ) {
-									log( 'error', err );
-								}
-								// never called
-								//console.log('error');
-								{
-									angular.noop();
+									//Todo: Think of error handling
+									window.console.log( 'error', err );
 								}
 							} );
 					}
 				} );
-				$scope.$watch( 'max', function ( val, oldVal ) {
+				$scope.$watch( 'sliderOpts.max', function ( val, oldVal ) {
 					if ( parseFloat( val ) !== parseFloat( oldVal ) ) {
-						var maxVar = $scope.layout.props.varMax;
-						//console.log('set max variable (' + maxVar + ') ' + val + ' (old: ' + oldVal + ')');
-						var app = qlik.currApp();
-						app.variable.setContent( '' + maxVar + '', '' + val + '' );
+						getApp().variable.setContent( '' + getMaxVar() + '', '' + val + '' );
 					}
 				} );
+
+				function getApp() {
+					return qlik.currApp();
+				}
+				function getMinVar() {
+					return $scope.layout.props.varMin;
+				}
+				function getMaxVar() {
+					return $scope.layout.props.varMax;
+				}
+
+				$scope.init = function () {
+
+
+
+
+				};
+				$scope.init();
 
 			}]
 		};
