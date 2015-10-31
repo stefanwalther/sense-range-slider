@@ -19,13 +19,13 @@ define( [
 			definition: props,
 			initialProperties: initprops,
 			template: ngTemplate,
-			snapshot: { canTakeSnapshot: false },
+			snapshot: {canTakeSnapshot: false},
 			controller: ['$scope', function ( $scope ) {
 
 				var opts = $scope.sliderOpts = {
 					orientation: 'horizontal',
 					step: 1,
-					rangeMin:0,
+					rangeMin: 0,
 					rangeMax: 100,
 					min: 0,
 					max: 100,
@@ -78,20 +78,36 @@ define( [
 					}
 				} );
 
-				function getApp() {
+				function getApp () {
 					return qlik.currApp();
 				}
-				function getMinVar() {
+
+				function getMinVar () {
 					return $scope.layout.props.varMin;
 				}
-				function getMaxVar() {
+
+				function getMaxVar () {
 					return $scope.layout.props.varMax;
+				}
+
+				function loadVal ( varName, target ) {
+
+					if ( varName ) {
+						getApp().variable.getContent( varName )
+							.then( function ( data ) {
+								if ( data && data.qContent && data.qContent.qIsNum ) {
+									$scope.sliderOpts[target] = data.qContent.qString;
+								}
+							}, function ( err ) {
+								window.console.error( err ); //Todo: Think of error handling and how to expose to the UI
+							} )
+					}
 				}
 
 				$scope.init = function () {
 
-
-
+					loadVal( getMinVar(), 'min' );
+					loadVal( getMaxVar(), 'max' );
 
 				};
 				$scope.init();

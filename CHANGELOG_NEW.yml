@@ -1,4 +1,9 @@
-version: "0.5.6"
+version: "0.2.7"
+  date: "2015-10-31"
+  enhancements:
+    - "Default values of the variables will be reflected"
+    - "Extend documentation"
+version: "0.2.6"
   date: "2015-10-26"
   enhancements:
     - "Disable buttons in edit mode (solves #26)"
