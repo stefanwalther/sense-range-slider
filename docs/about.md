@@ -1,0 +1,1 @@
+**sense-range-slider** allows you to manipulate one or two variables within the Qlik Sense client.
