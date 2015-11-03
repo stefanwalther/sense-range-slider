@@ -180,6 +180,11 @@ define( [
 
 						useClass = classNames.join( ' ' );
 
+						// (begin swr changes) see PR#89 on angular-rangeslider
+						// remove classes before adding
+						$slider.removeClass('ngrs-vertical ngrs-left ngrs-right ngrs-horizontal');
+						// (end swr changes)
+
 						// add class to element
 						$slider.addClass( useClass );
 

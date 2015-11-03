@@ -60,10 +60,32 @@ define( [], function () {
 	};
 
 	var orientation = {
-
 		ref: "props.orientation",
+		label: "Orientation",
 		type: "string",
-		label: "Orientation"
+		component: "dropdown",
+		default: "horizontal",
+		options: [
+			{
+				value: "horizontal",
+				label: "Horizontal"
+			},
+			{
+				value: "vertical",
+				label: "Vertical"
+			},
+			{
+				value: "vertical left",
+				label: "Vertical left"
+			},
+			{
+				value: "vertical right",
+				label: "Vertical right"
+			}
+		]
+	};
+
+	var showValues = {
 
 	};
 
@@ -80,12 +102,12 @@ define( [], function () {
 				items: {
 
 					sliderStep: sliderStep,
-
 					rangeMin: rangeMin,
 					rangeMax: rangeMax,
-
 					varMin: varMin,
-					varMax: varMax
+					varMax: varMax,
+					orientation: orientation
+
 				}
 			}
 		}

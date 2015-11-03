@@ -6,7 +6,7 @@ define( [
 		'qlik',
 		'./properties',
 		'./initialproperties',
-		'text!./lib/templ/slider.ng.html',
+		'text!./swr-slider.ng.html',
 
 		// No return values
 		'./lib/external/angular-rangeslider/angular.rangeSlider'
@@ -35,10 +35,10 @@ define( [
 				};
 
 				//Todo: prop for disabled
-				//Todo: prop for orientation
-				opts.step = $scope.layout.props.sliderStep || 1;
-				opts.rangeMin = $scope.layout.props.rangeMin || 0;
-				opts.rangeMax = $scope.layout.props.rangeMax || 100;
+				opts.step = $scope.layout.props.sliderStep;
+				opts.rangeMin = $scope.layout.props.rangeMin;
+				opts.rangeMax = $scope.layout.props.rangeMax;
+				opts.orientation = $scope.layout.props.orientation;
 
 				$scope.$watch( 'layout.props.enabled', function ( val, oldVal ) {
 					if ( val !== oldVal ) {
@@ -46,22 +46,34 @@ define( [
 					}
 				} );
 
-				$scope.$watch( 'layout.props.step', function ( val ) {
-					opts.step = val || 1;
+				$scope.$watch( 'layout.props.step', function ( newVal, oldVal ) {
+					if ( newVal !== oldVal ) {
+						opts.step = newVal || 1;
+					}
 				} );
 
-				$scope.$watch( 'layout.props.rangeMin', function ( val ) {
-					opts.rangeMin = val || 1;
+				$scope.$watch( 'layout.props.rangeMin', function ( newVal, oldVal ) {
+					if ( newVal !== oldVal ) {
+						opts.rangeMin = newVal || 1;
+					}
 				} );
 
-				$scope.$watch( 'layout.props.rangeMax', function ( val ) {
-					opts.rangeMax = val || 100;
+				$scope.$watch( 'layout.props.rangeMax', function ( newVal, oldVal ) {
+					if ( newVal !== oldVal ) {
+						opts.rangeMax = newVal || 100;
+					}
+				} );
+				$scope.$watch( 'layout.props.orientation', function ( newVal, oldVal ) {
+					if ( newVal !== oldVal ) {
+						console.log( 'new orientation', newVal );
+						opts.orientation = newVal;
+					}
 				} );
 
-				$scope.$watch( 'sliderOpts.min', function ( val, oldVal ) {
+				$scope.$watch( 'sliderOpts.min', function ( newVal, oldVal ) {
 
-					if ( parseFloat( val ) !== parseFloat( oldVal ) ) {
-						getApp().variable.setContent( '' + getMinVar() + '', '' + val + '' )
+					if ( parseFloat( newVal ) !== parseFloat( oldVal ) ) {
+						getApp().variable.setContent( '' + getMinVar() + '', '' + newVal + '' )
 							.then( function ( data ) {
 								angular.noop();
 							}, function ( err ) {
@@ -72,9 +84,9 @@ define( [
 							} );
 					}
 				} );
-				$scope.$watch( 'sliderOpts.max', function ( val, oldVal ) {
-					if ( parseFloat( val ) !== parseFloat( oldVal ) ) {
-						getApp().variable.setContent( '' + getMaxVar() + '', '' + val + '' );
+				$scope.$watch( 'sliderOpts.max', function ( newVal, oldVal ) {
+					if ( parseFloat( newVal ) !== parseFloat( oldVal ) ) {
+						getApp().variable.setContent( '' + getMaxVar() + '', '' + newVal + '' );
 					}
 				} );
 
@@ -112,7 +124,24 @@ define( [
 				};
 				$scope.init();
 
-			}]
-		};
+				$scope.resizeObj = function ( $elem ) {
+					console.log( 'container height', $elem.parent().height() );
+					if ( $elem && $elem.length ) {
+						var $target = $elem.find( '.ngrs-runner' );
+						if ( $scope.layout.props.orientation === 'vertical' ) {
+							$target.height( $elem.parent().height() - 50 );
+						} else {
+							$target.height('');
+						}
+					}
+				}
 
+			}],
+			paint: function ( $element /*,layout*/ ) {
+				this.$scope.resizeObj( $element );
+			},
+			resize: function ( $element ) {
+				this.$scope.resizeObj( $element );
+			}
+		};
 	} );
