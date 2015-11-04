@@ -332,7 +332,7 @@ define( [
 					function setMinMax () {
 
 						if ( scope.min > scope.max ) {
-							throwError( 'min must be less than or equal to max' );
+							throwError( 'min must be less than or equal to max (min: ' + scope.min + '/max: ' + scope.max + ')' );
 						}
 
 						// only do stuff when both values are ready
@@ -358,10 +358,13 @@ define( [
 
 					function setModelMinMax () {
 
-						if ( modelMin() > modelMax() ) {
-							throwWarning( 'modelMin must be less than or equal to modelMax' );
+						var min = modelMin();
+						var max = modelMax();
+
+						if ( min > max ) {
+							throwWarning( 'modelMin must be less than or equal to modelMax (min: ' + min + '/max: ' + max + ')' );
 							// reset values to correct
-							modelMin( modelMax() );
+							modelMin( max );
 						}
 
 						// only do stuff when both values are ready
