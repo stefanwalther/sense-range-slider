@@ -95,11 +95,21 @@ define( [], function () {
 		defaultValue: true
 	};
 
+	var showValues = {
+		ref: "props.showValues",
+		type: "boolean",
+		label: "Show values",
+		defaultValue: true
+	};
+
 	var moveValuesWithHandles = {
 		ref: "props.moveValuesWithHandles",
 		type: "boolean",
 		label: "Move values with handles",
-		defaultValue: false
+		defaultValue: false,
+		show: function ( data ) {
+			return data.showValues;
+		}
 	};
 
 	// ****************************************************************************************
@@ -121,6 +131,7 @@ define( [], function () {
 					orientation: orientation,
 					preventEqualMinMax: preventEqualMinMax,
 					pinHandle: pinHandle,
+					showValues: showValues,
 					moveValuesWithHandles: moveValuesWithHandles
 				}
 			}

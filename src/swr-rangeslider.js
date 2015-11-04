@@ -34,7 +34,8 @@ define( [
 					maxVar: null,
 					preventEqualMinMax: true,
 					pinHandle: '',
-					moveValuesWithHandles: false
+					moveValuesWithHandles: false,
+					showValues: true
 				};
 
 				//Todo: prop for disabled
@@ -42,10 +43,17 @@ define( [
 				opts.rangeMin = $scope.layout.props.rangeMin;
 				opts.rangeMax = $scope.layout.props.rangeMax;
 				opts.orientation = $scope.layout.props.orientation;
+				opts.showValues = $scope.layout.props.showValues;
 
 				$scope.$watch( 'layout.props.enabled', function ( newVal, oldVal ) {
 					if ( newVal !== oldVal ) {
 						opts.disabled = !newVal;
+					}
+				} );
+
+				$scope.$watch( 'layout.props.showValues', function ( newVal, oldVal ) {
+					if ( newVal !== oldVal ) {
+						opts.showValues = newVal;
 					}
 				} );
 
