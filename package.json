@@ -1,7 +1,7 @@
 {
   "name": "sense-range-slider",
-  "version": "0.2.7",
-  "description": "Slider object for Qlik Sense to manipulate one or two variables.",
+  "version": "0.3.0",
+  "description": "Range slider object for Qlik Sense.",
   "main": "index.js",
   "directories": {
     "doc": "docs"
@@ -9,6 +9,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "/build/sense-range-slider_latest.zip"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/QlikDev/qsRangeSlider.git"
@@ -26,6 +29,6 @@
     "sense-go": "^0.5.1"
   },
   "dependencies": {
-    "sense-extension-utils": "^0.1.3"
+    "sense-extension-utils": "^0.3.0"
   }
 }

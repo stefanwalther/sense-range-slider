@@ -2,24 +2,6 @@
 'use strict';
 define( [], function () {
 
-	var enabledDisabled = {
-		ref: "props.enabled",
-		type: "boolean",
-		component: "switch",
-		label: "Enable Slider",
-		options: [
-			{
-				value: true,
-				label: "Enabled"
-			},
-			{
-				value: false,
-				label: "Disabled"
-			}
-		],
-		defaultValue: true
-	};
-
 	var rangeMin = {
 		ref: "props.rangeMin",
 		label: "Lower Value",
@@ -85,12 +67,43 @@ define( [], function () {
 		]
 	};
 
-	var showValues = {
+	var pinHandle = {
+		ref: "props.pinHandle",
+		type: "string",
+		component: "radiobuttons",
+		label: "Activated handles",
+		options: [
+			{
+				value: "",
+				label: "Allow min & max"
+			},
+			{
+				value: "min",
+				label: "Allow only max"
+			},
+			{
+				value: "max",
+				label: "Allow only min"
+			}
+		]
+	};
 
+	var preventEqualMinMax = {
+		ref: "props.preventEqualMinMax",
+		type: "boolean",
+		label: "Prevent min to be equal max",
+		defaultValue: true
+	};
+
+	var moveValuesWithHandles = {
+		ref: "props.moveValuesWithHandles",
+		type: "boolean",
+		label: "Move values with handles",
+		defaultValue: false
 	};
 
 	// ****************************************************************************************
-	// Settings Accordion
+	// Property Panel definition
 	// ****************************************************************************************
 
 	var settings = {
@@ -100,14 +113,15 @@ define( [], function () {
 				type: "items",
 				label: "Slider: Range",
 				items: {
-
 					sliderStep: sliderStep,
 					rangeMin: rangeMin,
 					rangeMax: rangeMax,
 					varMin: varMin,
 					varMax: varMax,
-					orientation: orientation
-
+					orientation: orientation,
+					preventEqualMinMax: preventEqualMinMax,
+					pinHandle: pinHandle,
+					moveValuesWithHandles: moveValuesWithHandles
 				}
 			}
 		}

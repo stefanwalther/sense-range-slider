@@ -1,3 +1,11 @@
+version: "0.3.0"
+  date: "2015-11-04"
+  enhancements:
+    - "Load initial state depending on the min & max variables properly"
+    - "Added orientation: horizontal, vertical, vertical left and vertical right"
+    - "Added support to activate both, the min & max handle, only the min handle & only the max handle"
+    - "Added support to prevent min and max value to be the same value"
+    - "Added support to move the values along with the values"
 version: "0.2.7"
   date: "2015-10-31"
   enhancements:

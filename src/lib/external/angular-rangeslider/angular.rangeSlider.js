@@ -182,7 +182,7 @@ define( [
 
 						// (begin swr changes) see PR#89 on angular-rangeslider
 						// remove classes before adding
-						$slider.removeClass('ngrs-vertical ngrs-left ngrs-right ngrs-horizontal');
+						$slider.removeClass('ngrs-vertical ngrs-horizontal ngrs-left ngrs-right');
 						// (end swr changes)
 
 						// add class to element
@@ -194,6 +194,7 @@ define( [
 							posOpp = 'bottom';
 							orientation = 1;
 						}
+						setMinMax();
 					} );
 
 					attrs.$observe( 'step', function ( val ) {

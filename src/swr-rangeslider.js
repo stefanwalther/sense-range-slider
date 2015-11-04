@@ -20,7 +20,7 @@ define( [
 			initialProperties: initprops,
 			template: ngTemplate,
 			snapshot: {canTakeSnapshot: false},
-			controller: ['$scope', function ( $scope ) {
+			controller: ['$scope', '$element', function ( $scope, $element ) {
 
 				var opts = $scope.sliderOpts = {
 					orientation: 'horizontal',
@@ -31,18 +31,33 @@ define( [
 					max: 100,
 					disabled: false,
 					minVar: null,
-					maxVar: null
+					maxVar: null,
+					preventEqualMinMax: true,
+					pinHandle: '',
+					moveValuesWithHandles: false
 				};
 
 				//Todo: prop for disabled
-				opts.step = $scope.layout.props.sliderStep;
+				opts.step = $scope.layout.props.step;
 				opts.rangeMin = $scope.layout.props.rangeMin;
 				opts.rangeMax = $scope.layout.props.rangeMax;
 				opts.orientation = $scope.layout.props.orientation;
 
-				$scope.$watch( 'layout.props.enabled', function ( val, oldVal ) {
-					if ( val !== oldVal ) {
-						opts.disabled = !val;
+				$scope.$watch( 'layout.props.enabled', function ( newVal, oldVal ) {
+					if ( newVal !== oldVal ) {
+						opts.disabled = !newVal;
+					}
+				} );
+
+				$scope.$watch( 'layout.props.pinHandle', function ( newVal, oldVal ) {
+					if ( newVal !== oldVal ) {
+						opts.pinHandle = newVal;
+					}
+				} );
+
+				$scope.$watch( 'layout.props.moveValuesWithHandles', function ( newVal, oldVal ) {
+					if ( newVal !== oldVal ) {
+						opts.moveValuesWithHandles = newVal;
 					}
 				} );
 
@@ -52,9 +67,15 @@ define( [
 					}
 				} );
 
+				$scope.$watch('layout.props.preventEqualMinMax', function (newVal, oldVal) {
+					if ( newVal !== oldVal ) {
+						opts.step = newVal || 1;
+					}
+				});
+
 				$scope.$watch( 'layout.props.rangeMin', function ( newVal, oldVal ) {
 					if ( newVal !== oldVal ) {
-						opts.rangeMin = newVal || 1;
+						opts.preventEqualMinMax = newVal;
 					}
 				} );
 
@@ -116,25 +137,28 @@ define( [
 					}
 				}
 
-				$scope.init = function () {
-
-					loadVal( getMinVar(), 'min' );
-					loadVal( getMaxVar(), 'max' );
-
-				};
-				$scope.init();
-
 				$scope.resizeObj = function ( $elem ) {
 					console.log( 'container height', $elem.parent().height() );
 					if ( $elem && $elem.length ) {
 						var $target = $elem.find( '.ngrs-runner' );
-						if ( $scope.layout.props.orientation === 'vertical' ) {
+						if ( $scope.layout.props.orientation.indexOf('vertical') > -1 ) {
+							console.log('change height');
 							$target.height( $elem.parent().height() - 50 );
 						} else {
 							$target.height('');
 						}
 					}
-				}
+				};
+
+				$scope.init = function () {
+
+					loadVal( getMinVar(), 'min' );
+					loadVal( getMaxVar(), 'max' );
+					$scope.resizeObj( $element );
+
+				};
+				$scope.init();
+
 
 			}],
 			paint: function ( $element /*,layout*/ ) {
