@@ -20,7 +20,7 @@ define( [
 			initialProperties: initprops,
 			template: ngTemplate,
 			snapshot: {canTakeSnapshot: false},
-			controller: ['$scope', '$element', function ( $scope, $element ) {
+			controller: ['$scope', '$element', '$timeout', function ( $scope, $element, $timeout ) {
 
 				var opts = $scope.sliderOpts = {
 					orientation: 'horizontal',
@@ -38,7 +38,6 @@ define( [
 					showValues: true
 				};
 
-				//Todo: prop for disabled
 				opts.step = $scope.layout.props.step;
 				opts.rangeMin = $scope.layout.props.rangeMin;
 				opts.rangeMax = $scope.layout.props.rangeMax;
@@ -46,15 +45,15 @@ define( [
 				opts.showValues = $scope.layout.props.showValues;
 
 				$scope.$watchCollection( 'layout.props', function ( newVals, oldVals ) {
-					Object.keys(newVals ).forEach( function ( key ) {
-						if (newVals[key] !== oldVals[key]) {
+					Object.keys( newVals ).forEach( function ( key ) {
+						if ( newVals[key] !== oldVals[key] ) {
+							console.log( 'Changing ' + key + ' to ' + newVals[key] );
 							opts[key] = newVals[key];
 						}
-					});
-				});
+					} );
+				} );
 
 				$scope.$watch( 'sliderOpts.min', function ( newVal, oldVal ) {
-
 					if ( parseFloat( newVal ) !== parseFloat( oldVal ) ) {
 						getApp().variable.setContent( '' + getMinVar() + '', '' + newVal + '' )
 							.then( function ( data ) {
@@ -91,6 +90,7 @@ define( [
 						getApp().variable.getContent( varName )
 							.then( function ( data ) {
 								if ( data && data.qContent && data.qContent.qIsNum ) {
+									console.info( 'LoadVal: Setting value of variable ' + varName + ' to ' + data.qContent.qString );
 									$scope.sliderOpts[target] = data.qContent.qString;
 								}
 							}, function ( err ) {
@@ -99,28 +99,32 @@ define( [
 					}
 				}
 
+				/**
+				 * Several fixes to allow bind the height of the range-slider to its container.
+				 * @param $elem
+				 */
 				$scope.resizeObj = function ( $elem ) {
-					console.log( 'container height', $elem.parent().height() );
 					if ( $elem && $elem.length ) {
 						var $target = $elem.find( '.ngrs-runner' );
-						if ( $scope.layout.props.orientation.indexOf('vertical') > -1 ) {
-							console.log('change height');
+						if ( $scope.layout.props.orientation.indexOf( 'vertical' ) > -1 ) {
+							console.log( 'change height' );
 							$target.height( $elem.parent().height() - 50 );
 						} else {
-							$target.height('');
+							$target.height( '' );
 						}
 					}
 				};
 
 				$scope.init = function () {
 
-					loadVal( getMinVar(), 'min' );
-					loadVal( getMaxVar(), 'max' );
+					$timeout( function (  ) {
+						loadVal( getMinVar(), 'min' );
+						loadVal( getMaxVar(), 'max' );
+					});
 					$scope.resizeObj( $element );
 
 				};
 				$scope.init();
-
 
 			}],
 			paint: function ( $element /*,layout*/ ) {
