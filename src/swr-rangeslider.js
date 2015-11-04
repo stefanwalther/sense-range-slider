@@ -45,59 +45,13 @@ define( [
 				opts.orientation = $scope.layout.props.orientation;
 				opts.showValues = $scope.layout.props.showValues;
 
-				$scope.$watch( 'layout.props.enabled', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.disabled = !newVal;
-					}
-				} );
-
-				$scope.$watch( 'layout.props.showValues', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.showValues = newVal;
-					}
-				} );
-
-				$scope.$watch( 'layout.props.pinHandle', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.pinHandle = newVal;
-					}
-				} );
-
-				$scope.$watch( 'layout.props.moveValuesWithHandles', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.moveValuesWithHandles = newVal;
-					}
-				} );
-
-				$scope.$watch( 'layout.props.step', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.step = newVal || 1;
-					}
-				} );
-
-				$scope.$watch('layout.props.preventEqualMinMax', function (newVal, oldVal) {
-					if ( newVal !== oldVal ) {
-						opts.step = newVal || 1;
-					}
+				$scope.$watchCollection( 'layout.props', function ( newVals, oldVals ) {
+					Object.keys(newVals ).forEach( function ( key ) {
+						if (newVals[key] !== oldVals[key]) {
+							opts[key] = newVals[key];
+						}
+					});
 				});
-
-				$scope.$watch( 'layout.props.rangeMin', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.preventEqualMinMax = newVal;
-					}
-				} );
-
-				$scope.$watch( 'layout.props.rangeMax', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.rangeMax = newVal || 100;
-					}
-				} );
-				$scope.$watch( 'layout.props.orientation', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						console.log( 'new orientation', newVal );
-						opts.orientation = newVal;
-					}
-				} );
 
 				$scope.$watch( 'sliderOpts.min', function ( newVal, oldVal ) {
 
