@@ -374,16 +374,18 @@ define( [
 						) {
 
 							// make sure they are numbers
-							if ( !isNumber( modelMin() ) ) {
+							var vMin = modelMin();
+							if ( !isNumber( vMin ) ) {
 								if ( scope.pinHandle !== 'min' ) {
-									throwWarning( 'modelMin must be a number' );
+									throwWarning( 'modelMin must be a number (' + vMin + ')' );
 								}
 								modelMin( scope.min );
 							}
 
-							if ( !isNumber( modelMax() ) ) {
+							var vMax = modelMax();
+							if ( !isNumber( vMax ) ) {
 								if ( scope.pinHandle !== 'max' ) {
-									throwWarning( 'modelMax must be a number' );
+									throwWarning( 'modelMax must be a number (' + vMax + ')' );
 								}
 								modelMax( scope.max );
 							}

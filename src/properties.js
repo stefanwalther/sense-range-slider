@@ -1,6 +1,26 @@
 /*global define*/
 'use strict';
-define( [], function () {
+define( [
+	'qlik'
+], function ( qlik ) {
+
+	// Borrowed from qsVariable (Erik Wetterberg)
+	// Source: https://github.com/erikwett/qsVariable
+	function createVariable ( name ) {
+		var app = qlik.currApp();
+		//from 2.1: check if variable exists
+		if ( app.variable.getByName ) {
+			app.variable.getByName( name ).then( function () {
+				//variable already exist
+			}, function () {
+				//create variable
+				app.variable.create( name );
+			} );
+		} else {
+			//create variable - ignore errors
+			app.variable.create( name );
+		}
+	}
 
 	var rangeMin = {
 		ref: "props.rangeMin",
@@ -30,15 +50,27 @@ define( [], function () {
 	};
 
 	var varMin = {
-		ref: "props.varMin",
-		label: "Variable for Lower Value",
-		type: "string"
+		ref: "props.varMin.name",
+		label: "Variable name for the lower value",
+		type: "string",
+		change: function ( data ) {
+			if (data.props.varMin.name) {
+				createVariable( data.props.varMin.name );
+				data.props.varMin.value.qStringExpression = '=' + data.props.varMin.name;
+			}
+		}
 	};
 
 	var varMax = {
-		ref: "props.varMax",
-		label: "Variable for Upper Value",
-		type: "string"
+		ref: "props.varMax.name",
+		label: "Variable name for the upper value",
+		type: "string",
+		change: function ( data ) {
+			if (data.props.varMax.name) {
+				createVariable( data.props.varMax.name );
+				data.props.varMax.value.qStringExpression = '=' + data.props.varMax.value;
+			}
+		}
 	};
 
 	var orientation = {
@@ -115,7 +147,6 @@ define( [], function () {
 	// ****************************************************************************************
 	// Property Panel definition
 	// ****************************************************************************************
-
 	var settings = {
 		uses: "settings",
 		items: {

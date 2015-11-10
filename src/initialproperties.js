@@ -2,15 +2,15 @@
 define( [], function () {
     'use strict';
     return {
-        qHyperCubeDef: {
-            qDimensions: [],
-            qMeasures: [],
-            qInitialDataFetch: [
-                {
-                    qWidth: 2,
-                    qHeight: 50
-                }
-            ]
-        }
+       "props": {
+            "varMin": {
+                "name": "",
+                "value": {}
+            },
+           "varMax": {
+               "name": "",
+               "value": {}
+           }
+       }
     };
 } );

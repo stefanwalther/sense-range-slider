@@ -27,8 +27,8 @@ define( [
 					step: 1,
 					rangeMin: 0,
 					rangeMax: 100,
-					min: 0,
-					max: 100,
+					modelMin: 0,
+					modelMax: 100,
 					disabled: false,
 					minVar: null,
 					maxVar: null,
@@ -53,22 +53,16 @@ define( [
 					} );
 				} );
 
-				$scope.$watch( 'sliderOpts.min', function ( newVal, oldVal ) {
+				$scope.$watch( 'sliderOpts.modelMin', function ( newVal, oldVal ) {
 					if ( parseFloat( newVal ) !== parseFloat( oldVal ) ) {
-						getApp().variable.setContent( '' + getMinVar() + '', '' + newVal + '' )
-							.then( function ( data ) {
-								angular.noop();
-							}, function ( err ) {
-								if ( err ) {
-									//Todo: Think of error handling
-									window.console.log( 'error', err );
-								}
-							} );
+						getApp().variable.setContent( '' + getMinVar() + '', newVal );
 					}
 				} );
-				$scope.$watch( 'sliderOpts.max', function ( newVal, oldVal ) {
+
+				$scope.$watch( 'sliderOpts.modelMax', function ( newVal, oldVal ) {
 					if ( parseFloat( newVal ) !== parseFloat( oldVal ) ) {
-						getApp().variable.setContent( '' + getMaxVar() + '', '' + newVal + '' );
+						console.log('set model max', newVal);
+						getApp().variable.setContent( '' + getMaxVar() + '', newVal );
 					}
 				} );
 
@@ -76,28 +70,46 @@ define( [
 					return qlik.currApp();
 				}
 
-				function getMinVar () {
-					return $scope.layout.props.varMin;
+				function isNumber ( n ) {
+					return !isNaN( parseFloat( n ) ) && isFinite( n );
 				}
 
-				function getMaxVar () {
-					return $scope.layout.props.varMax;
+				/**
+				 * Returns the name of the minVar
+				 * @returns {exports.props.varMin|{name, value}|*}
+				 */
+				function getMinVar () {
+					return $scope.layout.props.varMin.name;
 				}
+
+				/**
+				 * Returns the name of the maxVar.
+				 * @returns {exports.props.varMax|{name, value}|*}
+				 */
+				function getMaxVar () {
+					return $scope.layout.props.varMax.name;
+				}
+
+
 
 				function loadVal ( varName, target ) {
-
-					if ( varName ) {
-						getApp().variable.getContent( varName )
-							.then( function ( data ) {
-								if ( data && data.qContent && data.qContent.qIsNum ) {
-									console.info( 'LoadVal: Setting value of variable ' + varName + ' to ' + data.qContent.qString );
-									$scope.sliderOpts[target] = data.qContent.qString;
-								}
-							}, function ( err ) {
-								window.console.error( err ); //Todo: Think of error handling and how to expose to the UI
-							} )
-					}
+					//if ( varName ) {
+					//	getApp().variable.getContent( varName )
+					//		.then( function ( data ) {
+					//			if ( data && data.qContent && data.qContent.qIsNum ) {
+					//				console.info( 'LoadVal: Setting value of variable ' + varName + ' to ' + data.qContent.qString );
+					//				$scope.sliderOpts[target] = data.qContent.qString;
+					//			}
+					//		}, function ( err ) {
+					//			window.console.error( err ); //Todo: Think of error handling and how to expose to the UI
+					//		} )
+					//}
 				}
+
+				$scope.setVals = function() {
+					$scope.sliderOpts.modelMin = isNumber($scope.layout.props.varMin.value) ? $scope.layout.props.varMin.value : 0;
+					$scope.sliderOpts.modelMax = isNumber($scope.layout.props.varMax.value) ? $scope.layout.props.varMax.value : 100;
+				};
 
 				/**
 				 * Several fixes to allow bind the height of the range-slider to its container.
@@ -117,18 +129,21 @@ define( [
 
 				$scope.init = function () {
 
-					$timeout( function (  ) {
-						loadVal( getMinVar(), 'min' );
-						loadVal( getMaxVar(), 'max' );
-					});
+					//$timeout( function (  ) {
+					//	loadVal( getMinVar(), 'min' );
+					//	loadVal( getMaxVar(), 'max' );
+					//});
 					$scope.resizeObj( $element );
 
 				};
 				$scope.init();
 
 			}],
-			paint: function ( $element /*,layout*/ ) {
-				this.$scope.resizeObj( $element );
+			paint: function ( $element, layout ) {
+				console.log('init: min', layout.props.varMin.value);
+				console.log('init: max', layout.props.varMax.value);
+				this.$scope.setVals();
+				this.$scope.init();
 			},
 			resize: function ( $element ) {
 				this.$scope.resizeObj( $element );
