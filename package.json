@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/QlikDev/qsRangeSlider",
   "devDependencies": {
-    "sense-go": "^0.5.1"
+    "sense-go": "^0.12.2"
   },
   "dependencies": {
     "sense-extension-utils": "^0.3.0"
