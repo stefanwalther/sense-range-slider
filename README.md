@@ -1,5 +1,7 @@
 # sense-range-slider
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/stefanwalther/sense-range-slider.svg)](https://greenkeeper.io/)
+
 > Slider object for Qlik Sense to manipulate one or two variables.
 
 ***
