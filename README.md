@@ -2,8 +2,6 @@
 
 > Slider object for Qlik Sense to manipulate one or two variables.
 
-[![](http://serve.mod.bz/branch/)](https://github.com/stefanwalther/sense-range-slider)
-
 ***
 
 ## Table of Contents
