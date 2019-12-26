@@ -20,94 +20,49 @@ define( [
 			initialProperties: initprops,
 			template: ngTemplate,
 			snapshot: {canTakeSnapshot: false},
-			controller: ['$scope', '$element', function ( $scope, $element ) {
+			controller: ['$scope', '$element', '$timeout', function ( $scope, $element, $timeout ) {
 
 				var opts = $scope.sliderOpts = {
 					orientation: 'horizontal',
 					step: 1,
 					rangeMin: 0,
 					rangeMax: 100,
-					min: 0,
-					max: 100,
+					modelMin: 0,
+					modelMax: 100,
 					disabled: false,
 					minVar: null,
 					maxVar: null,
 					preventEqualMinMax: true,
 					pinHandle: '',
-					moveValuesWithHandles: false
+					moveValuesWithHandles: false,
+					showValues: true
 				};
 
-				//Todo: prop for disabled
 				opts.step = $scope.layout.props.step;
 				opts.rangeMin = $scope.layout.props.rangeMin;
 				opts.rangeMax = $scope.layout.props.rangeMax;
 				opts.orientation = $scope.layout.props.orientation;
+				opts.showValues = $scope.layout.props.showValues;
 
-				$scope.$watch( 'layout.props.enabled', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.disabled = !newVal;
-					}
+				$scope.$watchCollection( 'layout.props', function ( newVals, oldVals ) {
+					Object.keys( newVals ).forEach( function ( key ) {
+						if ( newVals[key] !== oldVals[key] ) {
+							console.log( 'Changing ' + key + ' to ' + newVals[key] );
+							opts[key] = newVals[key];
+						}
+					} );
 				} );
 
-				$scope.$watch( 'layout.props.pinHandle', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.pinHandle = newVal;
-					}
-				} );
-
-				$scope.$watch( 'layout.props.moveValuesWithHandles', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.moveValuesWithHandles = newVal;
-					}
-				} );
-
-				$scope.$watch( 'layout.props.step', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.step = newVal || 1;
-					}
-				} );
-
-				$scope.$watch('layout.props.preventEqualMinMax', function (newVal, oldVal) {
-					if ( newVal !== oldVal ) {
-						opts.step = newVal || 1;
-					}
-				});
-
-				$scope.$watch( 'layout.props.rangeMin', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.preventEqualMinMax = newVal;
-					}
-				} );
-
-				$scope.$watch( 'layout.props.rangeMax', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						opts.rangeMax = newVal || 100;
-					}
-				} );
-				$scope.$watch( 'layout.props.orientation', function ( newVal, oldVal ) {
-					if ( newVal !== oldVal ) {
-						console.log( 'new orientation', newVal );
-						opts.orientation = newVal;
-					}
-				} );
-
-				$scope.$watch( 'sliderOpts.min', function ( newVal, oldVal ) {
-
+				$scope.$watch( 'sliderOpts.modelMin', function ( newVal, oldVal ) {
 					if ( parseFloat( newVal ) !== parseFloat( oldVal ) ) {
-						getApp().variable.setContent( '' + getMinVar() + '', '' + newVal + '' )
-							.then( function ( data ) {
-								angular.noop();
-							}, function ( err ) {
-								if ( err ) {
-									//Todo: Think of error handling
-									window.console.log( 'error', err );
-								}
-							} );
+						getApp().variable.setContent( '' + getMinVar() + '', newVal );
 					}
 				} );
-				$scope.$watch( 'sliderOpts.max', function ( newVal, oldVal ) {
+
+				$scope.$watch( 'sliderOpts.modelMax', function ( newVal, oldVal ) {
 					if ( parseFloat( newVal ) !== parseFloat( oldVal ) ) {
-						getApp().variable.setContent( '' + getMaxVar() + '', '' + newVal + '' );
+						console.log('set model max', newVal);
+						getApp().variable.setContent( '' + getMaxVar() + '', newVal );
 					}
 				} );
 
@@ -115,54 +70,80 @@ define( [
 					return qlik.currApp();
 				}
 
-				function getMinVar () {
-					return $scope.layout.props.varMin;
+				function isNumber ( n ) {
+					return !isNaN( parseFloat( n ) ) && isFinite( n );
 				}
 
-				function getMaxVar () {
-					return $scope.layout.props.varMax;
+				/**
+				 * Returns the name of the minVar
+				 * @returns {exports.props.varMin|{name, value}|*}
+				 */
+				function getMinVar () {
+					return $scope.layout.props.varMin.name;
 				}
+
+				/**
+				 * Returns the name of the maxVar.
+				 * @returns {exports.props.varMax|{name, value}|*}
+				 */
+				function getMaxVar () {
+					return $scope.layout.props.varMax.name;
+				}
+
+
 
 				function loadVal ( varName, target ) {
-
-					if ( varName ) {
-						getApp().variable.getContent( varName )
-							.then( function ( data ) {
-								if ( data && data.qContent && data.qContent.qIsNum ) {
-									$scope.sliderOpts[target] = data.qContent.qString;
-								}
-							}, function ( err ) {
-								window.console.error( err ); //Todo: Think of error handling and how to expose to the UI
-							} )
-					}
+					//if ( varName ) {
+					//	getApp().variable.getContent( varName )
+					//		.then( function ( data ) {
+					//			if ( data && data.qContent && data.qContent.qIsNum ) {
+					//				console.info( 'LoadVal: Setting value of variable ' + varName + ' to ' + data.qContent.qString );
+					//				$scope.sliderOpts[target] = data.qContent.qString;
+					//			}
+					//		}, function ( err ) {
+					//			window.console.error( err ); //Todo: Think of error handling and how to expose to the UI
+					//		} )
+					//}
 				}
 
+				$scope.setVals = function() {
+					$scope.sliderOpts.modelMin = isNumber($scope.layout.props.varMin.value) ? $scope.layout.props.varMin.value : 0;
+					$scope.sliderOpts.modelMax = isNumber($scope.layout.props.varMax.value) ? $scope.layout.props.varMax.value : 100;
+				};
+
+				/**
+				 * Several fixes to allow bind the height of the range-slider to its container.
+				 * @param $elem
+				 */
 				$scope.resizeObj = function ( $elem ) {
-					console.log( 'container height', $elem.parent().height() );
 					if ( $elem && $elem.length ) {
 						var $target = $elem.find( '.ngrs-runner' );
-						if ( $scope.layout.props.orientation.indexOf('vertical') > -1 ) {
-							console.log('change height');
+						if ( $scope.layout.props.orientation.indexOf( 'vertical' ) > -1 ) {
+							console.log( 'change height' );
 							$target.height( $elem.parent().height() - 50 );
 						} else {
-							$target.height('');
+							$target.height( '' );
 						}
 					}
 				};
 
 				$scope.init = function () {
 
-					loadVal( getMinVar(), 'min' );
-					loadVal( getMaxVar(), 'max' );
+					//$timeout( function (  ) {
+					//	loadVal( getMinVar(), 'min' );
+					//	loadVal( getMaxVar(), 'max' );
+					//});
 					$scope.resizeObj( $element );
 
 				};
 				$scope.init();
 
-
 			}],
-			paint: function ( $element /*,layout*/ ) {
-				this.$scope.resizeObj( $element );
+			paint: function ( $element, layout ) {
+				console.log('init: min', layout.props.varMin.value);
+				console.log('init: max', layout.props.varMax.value);
+				this.$scope.setVals();
+				this.$scope.init();
 			},
 			resize: function ( $element ) {
 				this.$scope.resizeObj( $element );

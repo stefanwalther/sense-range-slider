@@ -140,12 +140,17 @@ define( [
 					 */
 
 					var $slider = angular.element( element ),
+						uiDefaults = {
+							pos: 'left',
+							posOpp: 'right',
+							orientation: 0
+						},
 						handles = [element.find( '.ngrs-handle-min' ), element.find( '.ngrs-handle-max' )],
 						values = [element.find( '.ngrs-value-min' ), element.find( '.ngrs-value-max' )],
 						join = element.find( '.ngrs-join' ),
-						pos = 'left',
-						posOpp = 'right',
-						orientation = 0,
+						pos = uiDefaults.pos,
+						posOpp = uiDefaults.posOpp,
+						orientation = uiDefaults.orientation,
 						allowedRange = [0, 0],
 						range = 0,
 						down = false;
@@ -181,7 +186,7 @@ define( [
 						useClass = classNames.join( ' ' );
 
 						// (begin swr changes) see PR#89 on angular-rangeslider
-						// remove classes before adding
+						// remove classes before adding to ensure that there are no left-overs, so changing the orientation on the fly will work.
 						$slider.removeClass('ngrs-vertical ngrs-horizontal ngrs-left ngrs-right');
 						// (end swr changes)
 
@@ -193,8 +198,16 @@ define( [
 							pos = 'top';
 							posOpp = 'bottom';
 							orientation = 1;
-						}
+						} else { // begin swr changes
+							pos = uiDefaults.pos;
+							posOpp = uiDefaults.posOpp;
+							orientation = uiDefaults.orientation;
+						} //end swr changes
+
+						// begin swr changes
 						setMinMax();
+						setPinHandle( scopeOptions.pinHandle );
+						// end swr changes
 					} );
 
 					attrs.$observe( 'step', function ( val ) {
@@ -319,7 +332,7 @@ define( [
 					function setMinMax () {
 
 						if ( scope.min > scope.max ) {
-							throwError( 'min must be less than or equal to max' );
+							throwError( 'min must be less than or equal to max (min: ' + scope.min + '/max: ' + scope.max + ')' );
 						}
 
 						// only do stuff when both values are ready
@@ -345,10 +358,13 @@ define( [
 
 					function setModelMinMax () {
 
-						if ( modelMin() > modelMax() ) {
-							throwWarning( 'modelMin must be less than or equal to modelMax' );
+						var min = modelMin();
+						var max = modelMax();
+
+						if ( min > max ) {
+							throwWarning( 'modelMin must be less than or equal to modelMax (min: ' + min + '/max: ' + max + ')' );
 							// reset values to correct
-							modelMin( modelMax() );
+							modelMin( max );
 						}
 
 						// only do stuff when both values are ready
@@ -358,16 +374,18 @@ define( [
 						) {
 
 							// make sure they are numbers
-							if ( !isNumber( modelMin() ) ) {
+							var vMin = modelMin();
+							if ( !isNumber( vMin ) ) {
 								if ( scope.pinHandle !== 'min' ) {
-									throwWarning( 'modelMin must be a number' );
+									throwWarning( 'modelMin must be a number (' + vMin + ')' );
 								}
 								modelMin( scope.min );
 							}
 
-							if ( !isNumber( modelMax() ) ) {
+							var vMax = modelMax();
+							if ( !isNumber( vMax ) ) {
 								if ( scope.pinHandle !== 'max' ) {
-									throwWarning( 'modelMax must be a number' );
+									throwWarning( 'modelMax must be a number (' + vMax + ')' );
 								}
 								modelMax( scope.max );
 							}
@@ -417,6 +435,17 @@ define( [
 								scope.filteredModelMin = modelMin();
 								scope.filteredModelMax = modelMax();
 							}
+
+							// begin changes swr
+							// Reset CSS before applying, so changing the orientation on the fly will work.
+							angular.element( handles[0] ).css( 'top', '' ).css( 'bottom', '' ).css( 'left', '' ).css( 'right', '' );
+							angular.element( handles[1] ).css( 'top', '' ).css( 'bottom', '' ).css( 'left', '' ).css( 'right', '' );
+							angular.element( values[0] ).css( 'top', '' ).css( 'bottom', '' ).css( 'left', '' ).css( 'right', '' );
+							angular.element( values[1] ).css( 'top', '' ).css( 'bottom', '' ).css( 'left', '' ).css( 'right', '' );
+							angular.element( join ).css( 'top', '' ).css( 'bottom', '' ).css( 'left', '' ).css( 'right', '' );
+							// end changes swr
+
+
 
 							// check for no range
 							if ( scope.min === scope.max && modelMin() == modelMax() ) {
